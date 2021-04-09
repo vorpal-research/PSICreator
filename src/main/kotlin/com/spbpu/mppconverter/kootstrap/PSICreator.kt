@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.resolve.BindingContext
 import java.io.File
 
-
 @Suppress("DEPRECATION")
 class PSICreator() {
 
@@ -43,9 +42,6 @@ class PSICreator() {
             EnvironmentConfigFiles.JVM_CONFIG_FILES
         )
         val project = env.project as MockProject
-        project.registerService(
-            TreeAspect::class.java
-        )
 
         class MyPomModelImpl(env: KotlinCoreEnvironment) : PomModelImpl(env.project) {
             override fun runTransaction(pt: PomTransaction) = pt.run()
@@ -53,10 +49,14 @@ class PSICreator() {
 
 
         val pomModel = MyPomModelImpl(env)
-
         project.registerService(
             PomModel::class.java,
             pomModel
+        )
+        val treeAspect = TreeAspect(pomModel)
+        project.registerService(
+            TreeAspect::class.java,
+            treeAspect
         )
         return env
     }
